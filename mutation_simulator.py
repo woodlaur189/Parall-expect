@@ -1,23 +1,26 @@
+import err, os
 import csv
 import re
 from collections import Counter
 from numpy.random import choice
 import pandas
-#import sympy
-import scipy.stats as st
 from numpy import std, average, unique
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 
-print "/Users/lwoo0005/Documents/Laura_stuff/Misc Bioinformatics/w303_ref2.gff"
 ref_seq = str(raw_input("Input the path to the genome reference file.\n"))
 num_muts = int(raw_input("How many mutations?\n"))
 num_reps = float(raw_input("How many simulations should be run?\n"))
-print "\n/Users/lwoo0005/Documents/Laura_stuff/Misc Bioinformatics/final_para_list_nodoubles_LW_wt.csv"
 observed1 = str(raw_input("Please input the path to the first observation CSV file in which genes are in row 1 and frequencies in row 2.\n"))
 observed2 = str(raw_input("Please input the path to the second observation CSV file in which genes are in row 1 and frequencies in row 2.\n"))
-print "\n/Users/lwoo0005/Documents/Laura_stuff/ExpEvol_Program_Tests/16-11-17"
 out_folder = str(raw_input("Where do you want results to go? Enter a path.\n"))
+
+if not os.path.exists(out_folder):
+            try:
+                os.makedirs(out_folder)
+            except OSError as exc:
+                if exc.errno != errno.EEXIST:
+                    raise
 
 with open(observed1, 'r') as obs:
         ob_data1=(pandas.read_csv(obs, sep=',',header = 0, names=['freq','gene'],usecols=[0,1])).dropna()
@@ -68,7 +71,7 @@ for k,v in Counter(lengths).iteritems():
                 
 with open(out_folder+"/gene_length_distribution.csv","w") as results2:
         wtr = csv.writer(results2)
-        wtr.writerow(("Gene Size", "Frequency"))
+        wtr.writerow(("Gene length", "Frequency"))
         for key in sorted(gene_freq_dic.iterkeys()):
                 wtr.writerow((key,gene_freq_dic[key]))
 
@@ -103,24 +106,7 @@ def many_sims(num_reps,sort_gene_names,num_muts,weights):
     return all_reps
 
 sims=many_sims(num_reps,sort_gene_names,num_muts,weights)
-"""
-#old code
-    def all_mut_sim(sort_gene_names, genes_of_interest, num_muts, weights, num_reps, file_name):
 
-    all_reps = []
-    def mut_simulator(sort_gene_names, num_muts, weights_normal):
-        end_muts = {}
-        sim_muts=choice(sort_gene_names, size=num_muts, replace =True, p=weights_normal)
-        for mut in sim_muts:
-            if str(mut) in end_muts.keys():
-                end_muts[str(mut)]+=1
-            else:
-                end_muts[str(mut)]=1
-        return end_muts
-    for i in range(int(num_reps)):
-        sim=mut_simulator(sort_gene_names, num_muts, weights)
-        all_reps.append(sim)
-"""
 def sim_writes(sim_dic_list,sort_gene_names,genes_of_interest,file_name,num_muts,num_reps) :
     with open(str(out_folder)+"/"+file_name+"_simulation_genes-"+str(num_muts)+"_reps-"+str(int(num_reps))+".csv", 'w') as results3:
         wtr=csv.writer(results3)
@@ -298,73 +284,7 @@ plt.ylim(ymin=0)
 plt.tight_layout()
 plt.show()  
 
-#14-11-18 I don't think this bit was used so I've triple-quoted it out.
-"""
 
-
-    #max likelihood methods
-    
-    print freq
-    print gene
-    pos_int=float(freq)+(1.96*(float(freq)))**0.5
-    print pos_int
-    neg_int=float(freq)-(1.96*(float(freq)))**0.5
-    print neg_int
-
-    CI = (1.96/num_muts)*((freq*(num_muts-freq))/num_muts)**0.5
-    pos_int = ob_prob+CI
-    neg_int = ob_prob-CI
-    print gene
-    print freq
-    print ob_prob
-    print pos_int
-    print neg_int
-
-#re-weighting including unobserved genes and re-run of sim
-pos_indices = []
-neg_indices = []
-for sorted_gene in sort_gene_names:
-    if sorted_gene in ob_genes:
-        pos_indices.append(int(sort_gene_names.index(sorted_gene)))
-    else:
-        neg_indices.append(int(sort_gene_names.index(sorted_gene)))
-     
-i = 0
-factors = []
-for index in pos_indices:
-    start_weight=float(weights[index])
-    weights[index]=float(ob_freqs[i])/sum(ob_freqs)
-    factors.append(weights[index]/start_weight)
-    i+=1
-    
-divisor=float(sum(factors))
-for index in neg_indices:
-    start_weight=float(weights[index])
-    weights[index]=float(start_weight/divisor)
-
-for weight in weights:
-    weight = weight/float(sum(weights))
-    weights_normal.append(weight)
-
-ob_counts=all_mut_sim(sort_gene_names, ob_genes, num_muts, weights_normal, num_reps, "OBSERVED")
-
-#reweighting with only observed genes with max likelihood-derived independent event probabilities
-new_weights = [i/num_muts for i in ob_freqs]
-null_for_ob_genes = all_mut_sim(ob_genes, ob_genes, num_muts, new_weights, num_reps, "RE-WEIGHTED_OBSERVED")
-
-#solving for 0.95 = (nCx)(p^x)((1-p)^n-x)    
-from operator import mul    # or mul=lambda x,y:x*y
-from fractions import Fraction
-
-def nCk(n,k): 
-  return int( reduce(mul, (Fraction(n-i, i+1) for i in range(k)), 1) )
-
-for freq in ob_freqs:
-    n_C_k = nCk(int(num_muts),int(freq)
-    y = 0.95/n_C_k
-    solve(x**)
-
-"""
 
 print "Analysis complete and located in output folder--Thanks!"
          
