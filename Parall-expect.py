@@ -180,7 +180,7 @@ for count_list in [count_0, count_1,count_2,count_3,count_4,count_5]:
     neg_CIs.append(average(count_list)-y_err_bar)
 with open(str(out_folder)+"/STATSb_"+str(num_muts)+"_reps-"+str(int(num_reps))+".csv", 'w') as out:
     stats = csv.writer(out)
-    stats.writerow(("Times picked","Max","Min","Average","CI"))
+    stats.writerow(("Times picked","Min","Max","Average","CI"))
     for i in range(0,6):
-        stats.writerow((i,max_picks[i],min_picks[i],averages[i],str(neg_CIs[i])+", "+str(pos_CIs[i])))
+        stats.writerow((i,min_picks[i],max_picks[i],averages[i],str(neg_CIs[i])+", "+str(pos_CIs[i])))
     out.close()
