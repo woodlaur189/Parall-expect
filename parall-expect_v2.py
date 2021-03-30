@@ -3,6 +3,8 @@
 """
 Created on Tue Jun  2 17:25:30 2020
 
+Parell-expect v2
+
 @author: lwoo0005
 """
 
@@ -18,14 +20,6 @@ from Bio import SeqIO
 from Bio.SeqFeature import SeqFeature
 from Bio.SeqFeature import FeatureLocation
 
-#Input and output definitions
-"""
-ref_seq = str(raw_input("Input the path to the genome reference file.\n"))
-num_muts = int(raw_input("How many mutations?\n"))
-num_reps = float(raw_input("How many simulations should be run?\n"))
-observed1 = str(raw_input("Please input the path to the first observation CSV file in which genes are in row 1 and frequencies in row 2.\n"))
-out_folder = str(raw_input("Where do you want results to go? Enter a path.\n"))
-"""
 
 #num_reps = float(raw_input("How many simulations should be run?\n"))
 num_reps=100
@@ -35,8 +29,6 @@ ref_seq="/Users/lwoo0005/Documents/Jake_stuff/TEST_YJM978_chm_mito_micron_for_pa
 observed1="/Users/lwoo0005/Documents/Jake_stuff/test_yeast_obs.csv"
 out_folder="/Users/lwoo0005/Documents/Jake_stuff/parall-test/"
 #out_folder="/Users/lwoo0005/Documents/Laura_stuff/H_py_An/parall-expect/24-7-20/"
-in_mutvar_genes=["OAF1","FLC2","BDH2"]
-in_mutvar_rates=["300","500","0.03"]
 
 if not os.path.exists(out_folder):
     try:
@@ -58,11 +50,9 @@ ob_gene_freq_dic1 = dict(zip(ob_genes1,exp_freqs))
 records = [rec for rec in SeqIO.parse(ref_seq, "genbank")]
 
 lengths=[]
-true_lengths=[]
 genes=[]
 gois=[]
 lois=[]
-true_lois=[]
 ordered_exp_freqs=[]
 for record in records:
     for feature in record.features:
@@ -76,47 +66,36 @@ for record in records:
             length= abs(start-end)
             genes.append(gene_name)
             underscore_gene_name=gene_name.replace('-','_')
-            modifier=1
-            print gene_name
-            for in_mod_gene, in_mod_rate in zip(in_mutvar_genes, in_mutvar_rates):
-                if gene_name == in_mod_gene or underscore_gene_name == in_mod_gene:
-                    modifier=float(modifier)*float(in_mod_rate)
-            mod_length=float(modifier)*float(length)
-            print(length)
-            print(mod_length)
-            lengths.append(mod_length)
-            true_lengths.append(length)
+            lengths.append(length)
             for ob_gene, exp_freq in zip(ob_genes1, exp_freqs):
                 if gene_name == ob_gene or underscore_gene_name == ob_gene:
                     ordered_exp_freqs.append(exp_freq)
                     gois.append(gene_name)
-                    true_lois.append(length)
-                    lois.append(mod_length)
+                    lois.append(length)
             gene_name=""
             underscore_gene_name=""
             start=""
             end=""
             length=""
-            mod_length=""
             
          
 with open(str(out_folder)+"/LWTEST_lengths_of_observed_genes.csv","w") as results:
     wtr = csv.writer(results)
     wtr.writerow(("Gene", "Gene Length"))
-    for g, l in zip(gois,true_lois):
+    for g, l in zip(gois,lois):
         wtr.writerow((g,l))
     results.close()
 
 with open(str(out_folder)+"/LWTEST_lengths_of_all_genes.csv","w") as results:
     wtr = csv.writer(results)
     wtr.writerow(("Gene", "Gene Length"))
-    for g, l in zip(genes, true_lengths):
+    for g, l in zip(genes, lengths):
         wtr.writerow((g,l))
     results.close()
                   
 #Output file to show overall frequency distribution of gene lengths     
 gene_freq_dic = {}
-for k,v in Counter(true_lengths).iteritems():
+for k,v in Counter(lengths).iteritems():
                 gene_freq_dic[k]=v
 with open(out_folder+"/LWTEST_gene_length_distribution.csv","w") as results2:
         wtr = csv.writer(results2)
