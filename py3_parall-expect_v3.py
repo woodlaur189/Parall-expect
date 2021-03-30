@@ -4,6 +4,8 @@
 Created on Tue Jun  2 17:25:30 2020
 
 @author: lwoo0005
+
+Parall-expect v3
 """
 
 #Import relevant modules
