@@ -3,6 +3,8 @@
 """
 Created on Fri Jan 18 20:41:26 2019
 
+Parall-expect v1
+
 @author: lwoo0005
 """
 
